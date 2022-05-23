@@ -24,7 +24,19 @@ async function run(){
         await client.connect();
         const productCollection = client.db('Aronic_hardware_shop').collection('products');
 
-        console.log('connection')
+        // get products
+        app.get('/resent-products', async(req, res)=>{
+            const productCount = await productCollection.estimatedDocumentCount();
+            const products = productCollection.find();
+            if(productCount > 6){
+                const result = await products.skip(productCount - 6).toArray();
+                res.send(result);
+            }
+            else{
+                const result = await products.toArray();
+                res.send(result);
+            }
+        });
     }
     finally{
 
