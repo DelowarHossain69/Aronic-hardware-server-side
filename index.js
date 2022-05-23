@@ -56,7 +56,7 @@ async function run() {
       .collection("products");
     const userCollection = client
       .db("Aronic_hardware_shop")
-      .collection("products");
+      .collection("users");
 
     // get products
     app.get("/resent-products", async (req, res) => {
@@ -64,13 +64,21 @@ async function run() {
       const products = productCollection.find();
       if (productCount > 6) {
         const result = await products.skip(productCount - 6).toArray();
-        res.send(result);
+        const resentData = result.reverse();
+        res.send(resentData);
       } else {
         const result = await products.toArray();
-        res.send(result);
+        const resentData = result.reverse();
+        res.send(resentData);
       }
     });
 
+    // get all products
+    app.get('/products', async(req, res) => {
+        const data = await productCollection.find().toArray();
+        const result = data.reverse();
+        res.send(result);
+    })
     /**
      *
      * User manage
