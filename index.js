@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
@@ -78,7 +78,15 @@ async function run() {
         const data = await productCollection.find().toArray();
         const result = data.reverse();
         res.send(result);
-    })
+    });
+
+    // get single product by id
+    app.get('/product/:id', verifyToken, async(req, res)=>{
+        const id = req.params.id;
+        const query = {_id : ObjectId(id)};
+        const result = await productCollection.findOne(query);
+        res.send(result);
+    });
     /**
      *
      * User manage
