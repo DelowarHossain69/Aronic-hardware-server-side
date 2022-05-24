@@ -26,7 +26,9 @@ const verifyToken = (req, res, next) => {
     const decodedEmail = decoded.email;
 
     if (email === decodedEmail) {
+      req.decoded = email;
       next();
+
     } else {
       res.status(403).send({ message: "Forbidden access" });
     }
@@ -104,12 +106,27 @@ async function run() {
     });
 
     // get orders
-    app.get('/orders', async(req, res)=>{
+    app.get('/orders', verifyToken, async(req, res)=>{
         const email = req.query.email;
         const query = {email};
         const orders = await orderCollection.find(query).toArray();
         const resentOrders = orders.reverse();
         res.send(resentOrders);
+    });
+
+    // delete order
+    app.delete('/order', verifyToken, async(req, res)=>{
+        const {id} = req.query;
+        const query = {_id: ObjectId(id)};
+        const product = await orderCollection.findOne(query);
+       
+        if(!product?.paid){
+          const result = await orderCollection.deleteOne(query);
+          res.send({success : true, result});
+        }
+        else{
+          res.send({success : false});
+        }
     });
 
     /**
