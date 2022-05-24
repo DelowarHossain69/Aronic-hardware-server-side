@@ -96,10 +96,20 @@ async function run() {
      * Order manage
      * */
     
-    app.post('/order', async(req, res)=>{
+    // insert orders
+    app.post('/order', verifyToken, async(req, res)=>{
       const orderInfo = req.body;
       const result = await orderCollection.insertOne(orderInfo);
       res.send(result);
+    });
+
+    // get orders
+    app.get('/orders', async(req, res)=>{
+        const email = req.query.email;
+        const query = {email};
+        const orders = await orderCollection.find(query).toArray();
+        const resentOrders = orders.reverse();
+        res.send(resentOrders);
     });
 
     /**
