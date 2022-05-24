@@ -28,7 +28,6 @@ const verifyToken = (req, res, next) => {
     if (email === decodedEmail) {
       req.decoded = email;
       next();
-
     } else {
       res.status(403).send({ message: "Forbidden access" });
     }
@@ -64,6 +63,10 @@ async function run() {
       .db("Aronic_hardware_shop")
       .collection("orders");
 
+    const ratingCollection = client
+      .db("Aronic_hardware_shop")
+      .collection("rating");
+
     // get products
     app.get("/resent-products", async (req, res) => {
       const productCount = await productCollection.estimatedDocumentCount();
@@ -80,53 +83,60 @@ async function run() {
     });
 
     // get all products
-    app.get('/products', async(req, res) => {
-        const data = await productCollection.find().toArray();
-        const result = data.reverse();
-        res.send(result);
+    app.get("/products", async (req, res) => {
+      const data = await productCollection.find().toArray();
+      const result = data.reverse();
+      res.send(result);
     });
 
     // get single product by id
-    app.get('/product/:id', verifyToken, async(req, res)=>{
-        const id = req.params.id;
-        const query = {_id : ObjectId(id)};
-        const result = await productCollection.findOne(query);
-        res.send(result);
+    app.get("/product/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await productCollection.findOne(query);
+      res.send(result);
     });
 
     /**
      * Order manage
      * */
-    
+
     // insert orders
-    app.post('/order', verifyToken, async(req, res)=>{
+    app.post("/order", verifyToken, async (req, res) => {
       const orderInfo = req.body;
       const result = await orderCollection.insertOne(orderInfo);
       res.send(result);
     });
 
     // get orders
-    app.get('/orders', verifyToken, async(req, res)=>{
-        const email = req.query.email;
-        const query = {email};
-        const orders = await orderCollection.find(query).toArray();
-        const resentOrders = orders.reverse();
-        res.send(resentOrders);
+    app.get("/orders", verifyToken, async (req, res) => {
+      const email = req.query.email;
+      const query = { email };
+      const orders = await orderCollection.find(query).toArray();
+      const resentOrders = orders.reverse();
+      res.send(resentOrders);
     });
 
     // delete order
-    app.delete('/order', verifyToken, async(req, res)=>{
-        const {id} = req.query;
-        const query = {_id: ObjectId(id)};
-        const product = await orderCollection.findOne(query);
-       
-        if(!product?.paid){
-          const result = await orderCollection.deleteOne(query);
-          res.send({success : true, result});
-        }
-        else{
-          res.send({success : false});
-        }
+    app.delete("/order", verifyToken, async (req, res) => {
+      const { id } = req.query;
+      const query = { _id: ObjectId(id) };
+      const product = await orderCollection.findOne(query);
+
+      if (!product?.paid) {
+        const result = await orderCollection.deleteOne(query);
+        res.send({ success: true, result });
+      } else {
+        res.send({ success: false });
+      }
+
+    });
+
+    // Add product review
+    app.post('/rating', verifyToken, async(req, res)=>{
+        const reviewInfo = req.body;
+        const result = await ratingCollection.insertOne(reviewInfo);
+        res.send(result);
     });
 
     /**
@@ -153,8 +163,7 @@ async function run() {
         res.send({ success: false, accessToken: null });
       }
     });
-  } 
-  finally {
+  } finally {
   }
 }
 
