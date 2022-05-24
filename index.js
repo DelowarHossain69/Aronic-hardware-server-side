@@ -12,7 +12,6 @@ app.use(cors());
 
 const verifyToken = (req, res, next) => {
   const email = req.query.email;
-  console.log(email);
   const auth = req.headers.auth;
   if (!auth) {
     return res.status(401).send({ message: "Unauthorized user" });
@@ -54,9 +53,14 @@ async function run() {
     const productCollection = client
       .db("Aronic_hardware_shop")
       .collection("products");
+
     const userCollection = client
       .db("Aronic_hardware_shop")
       .collection("users");
+
+    const orderCollection = client
+      .db("Aronic_hardware_shop")
+      .collection("orders");
 
     // get products
     app.get("/resent-products", async (req, res) => {
@@ -87,6 +91,17 @@ async function run() {
         const result = await productCollection.findOne(query);
         res.send(result);
     });
+
+    /**
+     * Order manage
+     * */
+    
+    app.post('/order', async(req, res)=>{
+      const orderInfo = req.body;
+      const result = await orderCollection.insertOne(orderInfo);
+      res.send(result);
+    });
+
     /**
      *
      * User manage
