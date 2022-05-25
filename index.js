@@ -218,19 +218,33 @@ async function run() {
     });
 
     // delete user
-    app.delete('/user', verifyToken, async(req, res)=> {
+    app.delete('/user', verifyToken, verifyAdmin, async(req, res)=> {
         const {id} = req.query;
         const query = {_id : ObjectId(id)};
         const result = await userCollection.deleteOne(query);
         res.send(result);
     });
 
-    app.put('/admin', verifyToken, async(req, res) => {
+    // Create Admin
+    app.put('/admin', verifyToken, verifyAdmin, async(req, res) => {
       const {id} = req.query;
       const query = {_id : ObjectId(id)};
       const doc = {$set : {role : 'Admin'}};
       const result = await userCollection.updateOne(query, doc);
       res.send(result);
+    });
+
+    // is admin
+    app.get('/isAdmin', async(req, res)=>{
+      const {email} = req.query;
+      const user = await userCollection.findOne({email});
+
+      if(user?.role === "Admin"){
+        res.send({isAdmin : true});
+      }
+      else{
+        res.send({isAdmin : false});
+      }
     });
 
   } finally {
