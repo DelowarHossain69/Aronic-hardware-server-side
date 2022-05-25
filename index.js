@@ -67,6 +67,20 @@ async function run() {
       .db("Aronic_hardware_shop")
       .collection("rating");
 
+      // Verify admin
+      const verifyAdmin = async(req, res, next) => {
+        const email = req.decoded;
+        const query = {email};
+        const user = await userCollection.findOne(query);
+
+        if(user?role === 'Admin'){
+          next();
+        }
+        else{
+            res.status(403).send({message : 'Frobidden access'});
+        }
+      }
+
     // get products
     app.get("/resent-products", async (req, res) => {
       const productCount = await productCollection.estimatedDocumentCount();
@@ -198,7 +212,7 @@ async function run() {
     });
 
     // Get all user
-    app.get('/allUser', async(req, res) => {
+    app.get('/allUser',verifyToken, verifyAdmin, async(req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
