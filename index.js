@@ -16,13 +16,14 @@ const verifyToken = (req, res, next) => {
   if (!auth) {
     return res.status(401).send({ message: "Unauthorized user" });
   }
-
+  
   const token = auth.split(" ")[1];
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
     if (err) {
-      res.status(403).send({ message: "Forbidden access" });
+      res.status(403).send({ message: "Forbidden access-" });
     }
 
+    console.log(decoded, email);
     const decodedEmail = decoded.email;
 
     if (email === decodedEmail) {
@@ -73,7 +74,7 @@ async function run() {
         const query = {email};
         const user = await userCollection.findOne(query);
 
-        if(user?role === 'Admin'){
+        if(user?.role === 'Admin') {
           next();
         }
         else{
@@ -94,6 +95,13 @@ async function run() {
         const resentData = result.reverse();
         res.send(resentData);
       }
+    });
+
+    // Add product (Admin control)
+    app.post('/product', async(req, res)=>{
+      const productInfo = req.body;
+      const result = await productCollection.insertOne(productInfo);
+      res.send(result);
     });
 
     // get all products
@@ -212,7 +220,7 @@ async function run() {
     });
 
     // Get all user
-    app.get('/allUser',verifyToken, verifyAdmin, async(req, res) => {
+    app.get('/allUser', async(req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
