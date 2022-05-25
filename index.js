@@ -154,8 +154,8 @@ async function run() {
 
     // Create user with jwt;
     app.put("/user", async (req, res) => {
-      const { name, email } = req.body;
-      const updatedDoc = { $set: { name, email } };
+      const { name, email, image } = req.body;
+      const updatedDoc = { $set: { name, email, image } };
       const query = { email };
       const option = { upsert: true };
 
@@ -171,7 +171,7 @@ async function run() {
         res.send({ success: false, accessToken: null });
       }
     });
-    
+
     // get single user
     app.get('/user', verifyToken, async(req, res)=>{
       const email = req.query.email;
@@ -195,6 +195,20 @@ async function run() {
       else{
         res.send({success : false});
       }
+    });
+
+    // Get all user
+    app.get('/allUser', async(req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users);
+    });
+
+    // delete user
+    app.delete('/user', verifyToken, async(req, res)=> {
+        const {id} = req.query;
+        const query = {_id : ObjectId(id)};
+        const result = await userCollection.deleteOne(query);
+        res.send(result);
     });
 
   } finally {
