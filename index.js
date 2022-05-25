@@ -179,7 +179,13 @@ async function run() {
       const option = {upsert : true};
       const info = {$set : updatedData};
       const result = await userCollection.updateOne(query, info, option);
-      res.send(result);
+      
+      if(result){
+        res.send({success : true, result});
+      }
+      else{
+        res.send({success : false});
+      }
     });
 
   } finally {
