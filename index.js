@@ -171,8 +171,17 @@ async function run() {
         res.send({ success: false, accessToken: null });
       }
     });
+    
+    // get single user
+    app.get('/user', verifyToken, async(req, res)=>{
+      const email = req.query.email;
+      const query = {email};
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
 
-    app.put('/user', verifyToken, async(req, res) => {
+    // update user profle
+    app.put('/updateUser', verifyToken, async(req, res) => {
       const email = req.query.email;
       const query = {email};
       const updatedData = req.body;
