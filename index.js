@@ -211,6 +211,14 @@ async function run() {
         res.send(result);
     });
 
+    app.put('/admin', verifyToken, async(req, res) => {
+      const {id} = req.query;
+      const query = {_id : ObjectId(id)};
+      const doc = {$set : {role : 'Admin'}};
+      const result = await userCollection.updateOne(query, doc);
+      res.send(result);
+    });
+
   } finally {
   }
 }
