@@ -152,6 +152,7 @@ async function run() {
      *
      */
 
+    // Create user with jwt;
     app.put("/user", async (req, res) => {
       const { name, email } = req.body;
       const updatedDoc = { $set: { name, email } };
@@ -170,6 +171,17 @@ async function run() {
         res.send({ success: false, accessToken: null });
       }
     });
+
+    app.put('/user', verifyToken, async(req, res) => {
+      const email = req.query.email;
+      const query = {email};
+      const updatedData = req.body;
+      const option = {upsert : true};
+      const info = {$set : updatedData};
+      const result = await userCollection.updateOne(query, info, option);
+      res.send(result);
+    });
+
   } finally {
   }
 }
