@@ -135,10 +135,17 @@ async function run() {
     // Add product review
     app.post('/rating', verifyToken, async(req, res)=>{
         const reviewInfo = req.body;
+        console.log(reviewInfo)
         const result = await ratingCollection.insertOne(reviewInfo);
         res.send(result);
     });
 
+    // get all reviews
+    app.get('/rating', async(req, res)=> {
+      const result = await ratingCollection.find().toArray();
+      const resentReview = result.reverse();
+      res.send(resentReview);
+    });
     /**
      *
      * User manage
