@@ -128,9 +128,9 @@ async function run() {
     });
 
     // update product (admin control);
-    app.put('/product', async(req, res)=> {
+    app.put('/product/:id', async(req, res)=> {
       const updatedInfo = req.body;
-      const {id} = req.query;
+      const {id} = req.params;
       const query = {_id : ObjectId(id)};
       const option = {upsert: true};
       const doc = {$set : updatedInfo};
@@ -149,7 +149,7 @@ async function run() {
       res.send(result);
     });
 
-    // get orders
+    // get customer orders
     app.get("/orders", verifyToken, async (req, res) => {
       const email = req.query.email;
       const query = { email };
@@ -171,6 +171,12 @@ async function run() {
         res.send({ success: false });
       }
 
+    });
+
+    // get all orders (admin control)
+    app.get('/manageOrders', verifyToken, async(req, res)=>{
+        const orders = await orderCollection.find().toArray();
+        res.send(orders);
     });
 
     // Add product review
