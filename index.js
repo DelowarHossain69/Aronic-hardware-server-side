@@ -173,10 +173,22 @@ async function run() {
 
     });
 
+    // update orders 
+    app.put('/updateOrder', verifyToken, async(req, res)=>{
+        const {id} = req.query;
+        const updatedDoc = req.body;
+        const option = {upsert : true};
+        const doc = {$set : updatedDoc};
+        const query = {_id : ObjectId(id)};
+        const result = await orderCollection.updateOne(query, doc, option);
+        res.send(result);
+    });
+
     // get all orders (admin control)
     app.get('/manageOrders', verifyToken, async(req, res)=>{
         const orders = await orderCollection.find().toArray();
-        res.send(orders);
+        const recentOrders = orders.reverse();
+        res.send(recentOrders);
     });
 
     // Add product review
