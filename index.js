@@ -173,7 +173,7 @@ async function run() {
 
     });
 
-    // update orders 
+    // update orders (Admin control)
     app.put('/updateOrder', verifyToken, async(req, res)=>{
         const {id} = req.query;
         const updatedDoc = req.body;
@@ -181,6 +181,14 @@ async function run() {
         const doc = {$set : updatedDoc};
         const query = {_id : ObjectId(id)};
         const result = await orderCollection.updateOne(query, doc, option);
+        res.send(result);
+    });
+
+    // order cancel (Admin control)
+    app.get('/orderCancel', verifyToken, async(req, res)=>{
+        const {id} = req.query;
+        const query = {_id : ObjectId(id)};
+        const result = await orderCollection.deleteOne(query);
         res.send(result);
     });
 
