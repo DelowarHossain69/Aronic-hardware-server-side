@@ -6,6 +6,7 @@ const { application } = require("express");
 const app = express();
 const PORT = process.env.PORT || 5000;
 require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIP_SECRECT_KEY);
 
 // Middleware
 app.use(express.json());
@@ -308,6 +309,43 @@ async function run() {
         res.send({isAdmin : false});
       }
     });
+
+    /*//================= Payment get way ===================*/
+
+    app.post("/create-payment-intent",  async (req, res) =>{
+      console.log('hi');
+      const {price} = req.body;
+      const amount = price * 100;
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount : amount,
+        currency: "usd",
+        payment_method_types: ['card']
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    })
+
+
+    // app.post("/create-payment-intent"), async (req, res) => {
+    //   console.log('hi');
+    //   const {price} = req.body;
+    //   const amount = price * 100;
+
+    //   const paymentIntent = await stripe.paymentIntents.create({
+    //     amount: amount,
+    //     currency: "usd",
+    //     payment_methods_types: ['card']
+    //   });
+    
+    //   res.send({
+    //     clientSecret: paymentIntent.client_secret,
+    //   });
+    // });
+
+    
 
   } finally {
   }
