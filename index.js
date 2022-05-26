@@ -23,7 +23,6 @@ const verifyToken = (req, res, next) => {
       res.status(403).send({ message: "Forbidden access-" });
     }
 
-    console.log(decoded, email);
     const decodedEmail = decoded.email;
 
     if (email === decodedEmail) {
@@ -117,6 +116,14 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const result = await productCollection.findOne(query);
       res.send(result);
+    });
+
+    // delete product (admin control)
+    app.delete('/product', async(req, res)=> {
+      const {id} = req.query;
+      const query = {_id : ObjectId(id)};
+      const result = await productCollection.deleteOne(query);
+      res.send(result); 
     });
 
     /**
