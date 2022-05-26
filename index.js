@@ -69,6 +69,10 @@ async function run() {
       .db("Aronic_hardware_shop")
       .collection("rating");
 
+    const transactionCollection = client
+      .db("Aronic_hardware_shop")
+      .collection("transaction");
+
       // Verify admin
       const verifyAdmin = async(req, res, next) => {
         const email = req.decoded;
@@ -180,6 +184,18 @@ async function run() {
         res.send({ success: false });
       }
 
+    });
+
+    // update order paid statue
+    app.patch('/update', verifyToken, async(req, res)=> {
+      const {id} = req.query;
+      const updatedData = req.body;
+      const query = {_id : ObjectId(id)};
+      const updatedDoc = {$set : updatedData};
+
+      const storedTransactionId = transactionCollection.insertOne({id, updatedData});
+      const updateData = await orderCollection.updateOne(query, updatedDoc);
+      res.send(updateData);
     });
 
     // update orders (Admin control)
@@ -327,24 +343,6 @@ async function run() {
         clientSecret: paymentIntent.client_secret,
       });
     })
-
-
-    // app.post("/create-payment-intent"), async (req, res) => {
-    //   console.log('hi');
-    //   const {price} = req.body;
-    //   const amount = price * 100;
-
-    //   const paymentIntent = await stripe.paymentIntents.create({
-    //     amount: amount,
-    //     currency: "usd",
-    //     payment_methods_types: ['card']
-    //   });
-    
-    //   res.send({
-    //     clientSecret: paymentIntent.client_secret,
-    //   });
-    // });
-
     
 
   } finally {
