@@ -158,6 +158,14 @@ async function run() {
       res.send(resentOrders);
     });
 
+    // get order details
+    app.get('/orderDetails', verifyToken, async(req, res)=>{
+        const {id} = req.query;
+        const query = {_id : ObjectId(id)};
+        const result = await orderCollection.findOne(query);
+        res.send(result);
+    });
+
     // delete order
     app.delete("/order", verifyToken, async (req, res) => {
       const { id } = req.query;
@@ -185,8 +193,9 @@ async function run() {
     });
 
     // order cancel (Admin control)
-    app.get('/orderCancel', verifyToken, async(req, res)=>{
+    app.delete('/orderCancel', verifyToken, async(req, res)=>{
         const {id} = req.query;
+        console.log(' hi ', id)
         const query = {_id : ObjectId(id)};
         const result = await orderCollection.deleteOne(query);
         res.send(result);
