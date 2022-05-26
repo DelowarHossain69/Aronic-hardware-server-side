@@ -2,6 +2,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const { application } = require("express");
 const app = express();
 const PORT = process.env.PORT || 5000;
 require("dotenv").config();
@@ -124,6 +125,17 @@ async function run() {
       const query = {_id : ObjectId(id)};
       const result = await productCollection.deleteOne(query);
       res.send(result); 
+    });
+
+    // update product (admin control);
+    app.put('/product', async(req, res)=> {
+      const updatedInfo = req.body;
+      const {id} = req.query;
+      const query = {_id : ObjectId(id)};
+      const option = {upsert: true};
+      const doc = {$set : updatedInfo};
+      const result = await productCollection.updateOne(query, doc, option);
+      res.send(result);
     });
 
     /**
