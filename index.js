@@ -80,6 +80,7 @@ async function run() {
         const user = await userCollection.findOne(query);
 
         if(user?.role === 'Admin') {
+          console.log('admin')
           next();
         }
         else{
@@ -103,7 +104,7 @@ async function run() {
     });
 
     // Add product (Admin control)
-    app.post('/product', async(req, res)=>{
+    app.post('/product', verifyToken, verifyAdmin, async(req, res)=>{
       const productInfo = req.body;
       const result = await productCollection.insertOne(productInfo);
       res.send(result);
@@ -125,7 +126,7 @@ async function run() {
     });
 
     // delete product (admin control)
-    app.delete('/product', async(req, res)=> {
+    app.delete('/product', verifyToken, verifyAdmin, async(req, res)=> {
       const {id} = req.query;
       const query = {_id : ObjectId(id)};
       const result = await productCollection.deleteOne(query);
@@ -133,7 +134,7 @@ async function run() {
     });
 
     // update product (admin control);
-    app.put('/product/:id', async(req, res)=> {
+    app.put('/product/:id', verifyToken, verifyAdmin, async(req, res)=> {
       const updatedInfo = req.body;
       const {id} = req.params;
       const query = {_id : ObjectId(id)};
@@ -199,7 +200,7 @@ async function run() {
     });
 
     // update orders (Admin control)
-    app.put('/updateOrder', verifyToken, async(req, res)=>{
+    app.put('/updateOrder', verifyToken, verifyAdmin, async(req, res)=>{
         const {id} = req.query;
         const updatedDoc = req.body;
         const option = {upsert : true};
@@ -210,16 +211,15 @@ async function run() {
     });
 
     // order cancel (Admin control)
-    app.delete('/orderCancel', verifyToken, async(req, res)=>{
+    app.delete('/orderCancel', verifyToken, verifyAdmin, async(req, res)=>{
         const {id} = req.query;
-        console.log(' hi ', id)
         const query = {_id : ObjectId(id)};
         const result = await orderCollection.deleteOne(query);
         res.send(result);
     });
 
     // get all orders (admin control)
-    app.get('/manageOrders', verifyToken, async(req, res)=>{
+    app.get('/manageOrders', verifyToken, verifyAdmin, async(req, res)=>{
         const orders = await orderCollection.find().toArray();
         const recentOrders = orders.reverse();
         res.send(recentOrders);
@@ -328,7 +328,7 @@ async function run() {
 
     /*//================= Payment get way ===================*/
 
-    app.post("/create-payment-intent",  async (req, res) =>{
+    app.post("/create-payment-intent", verifyToken, async (req, res) =>{
       console.log('hi');
       const {price} = req.body;
       const amount = price * 100;
