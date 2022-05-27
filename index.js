@@ -80,11 +80,10 @@ async function run() {
         const user = await userCollection.findOne(query);
 
         if(user?.role === 'Admin') {
-          console.log('admin')
           next();
         }
         else{
-            res.status(403).send({message : 'Frobidden access'});
+            res.status(403).send({message : 'Forbidden access'});
         }
       }
 
