@@ -290,7 +290,7 @@ async function run() {
     });
 
     // Get all user
-    app.get('/allUser', async(req, res) => {
+    app.get('/allUser', verifyToken, verifyAdmin, async(req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });

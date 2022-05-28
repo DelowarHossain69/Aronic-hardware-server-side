@@ -9,3 +9,6 @@
     * dotenv
     * Stripe (etc)
 
+# Admin email : 
+# Admin Password : 
+
