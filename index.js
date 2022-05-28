@@ -187,7 +187,7 @@ async function run() {
     });
 
     // update order paid statue
-    app.patch('/update', verifyToken, async(req, res)=> {
+    app.put('/update', verifyToken, async(req, res)=> {
       const {id} = req.query;
       const updatedData = req.body;
       const query = {_id : ObjectId(id)};
