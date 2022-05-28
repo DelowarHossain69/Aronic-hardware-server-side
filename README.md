@@ -9,6 +9,6 @@
     * dotenv
     * Stripe (etc)
 
-# Admin email : 
-# Admin Password : 
+# Admin email : example@example.com
+# Admin password : example123
 
